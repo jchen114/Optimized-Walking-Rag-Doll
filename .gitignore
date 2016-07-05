@@ -141,6 +141,8 @@ publish/
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
+# TODO: Comment the next line if you want to checkin your web deploy settings
+>>>>>>> d8ee599addea082cf94e6b61e712119064b5fd80
 # but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
 *.publishproj
@@ -256,4 +258,3 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
-
