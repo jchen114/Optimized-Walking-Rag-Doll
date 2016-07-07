@@ -46,12 +46,13 @@ public:
 	}
 
 	float GetAngularVelocity() {
-		/*printf("Angular Velocity = %f, %f, %f \n", 
-			Constants::GetInstance().RadiansToDegrees(GetRigidBody()->getAngularVelocity().x()), 
-			Constants::GetInstance().RadiansToDegrees(GetRigidBody()->getAngularVelocity().y()), 
-			Constants::GetInstance().RadiansToDegrees(GetRigidBody()->getAngularVelocity().z()));*/
 		float angle = Constants::GetInstance().RadiansToDegrees(GetRigidBody()->getAngularVelocity().z());
 		return angle;
+	}
+
+	btVector3 GetLinearVelocity() {
+		btVector3 linVec = GetRigidBody()->getLinearVelocity();
+		return linVec;
 	}
 
 	void ApplyTorque(const btVector3 &torque) {

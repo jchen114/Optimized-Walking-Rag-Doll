@@ -6,6 +6,7 @@
 
 #include "LinearMath\btQuickprof.h"
 #include "LinearMath\btVector3.h"
+#include <functional>
 
 class RagDollApplication;
 class State;
@@ -125,8 +126,11 @@ public:
 	void NotifyTorsoGroundContact();
 	void ChangeGait(std::string gait);
 
-	void SetGait(Gait gait, std::string gait_name);
-	void SetCallbackFunction(std::function<void(std::vector<float> linearVelocities, std::vector<float> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> func);
+	void AddGait(Gait gait, std::string gait_name);
+	void SetCallbackFunction(
+		std::function<void(std::vector<btVector3> linearVelocities, std::vector<btVector3> linearPositions, 
+		std::vector<float> angularVelocities, std::vector<float> angularPositions)> func
+		);
 
 	void SetState1(float torso, float upperLeftLeg, float upperRightLeg, float lowerLeftLeg, float lowerRightLeg, float leftFoot, float rightFoot);
 	void SetState2(float torso, float upperLeftLeg, float upperRightLeg, float lowerLeftLeg, float lowerRightLeg, float leftFoot, float rightFoot);
@@ -207,6 +211,8 @@ public:
 
 	std::string m_currentGait;
 
+	std::vector<std::string> m_gaits;
+
 private:
 
 	bool m_leftFootGroundHasContacted = false;
@@ -236,7 +242,8 @@ private:
 
 	float CalculateTorque(float kp, float kd, float targetPosition, float currentPosition, float velocity);
 
-	std::function<void(std::vector<float> linearVelocities, std::vector<float> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> m_BodyStateCallback;
+	std::function<
+		void(std::vector<btVector3> linearVelocities, std::vector<btVector3> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> m_BodyStateCallback;
 
 
 };

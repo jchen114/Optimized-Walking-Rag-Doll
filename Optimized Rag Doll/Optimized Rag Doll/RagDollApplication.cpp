@@ -88,12 +88,6 @@ void RagDollApplication::InitializePhysics() {
 	// Create Controller
 	m_WalkingController = new WalkingController(this);
 
-	std::vector<std::string> gaits = m_WalkingController->GetGaits();
-	int ind = 0;
-	for (std::vector<std::string>::iterator it = gaits.begin(); it != gaits.end(); ++it) {
-		std::string gait_name = *it;
-		m_gaits.push_back(gait_name);
-	}
 	m_WalkingController->ChangeGait("Walk"); // Assume Walk gait exists
 
 	m_previousState = 0;
@@ -397,11 +391,11 @@ void RagDollApplication::CreateRagDollGUI() {
 	/* ==================================== GAITS ============================================= */
 
 	GLUI_Panel *gait_panel = m_glui_window->add_panel("Gaits");
-	m_GaitsRadioGroup = m_glui_window->add_radiogroup_to_panel(gait_panel, &m_currentGait, -1, (GLUI_Update_CB)GaitsChanged);
+	m_GaitsRadioGroup = m_glui_window->add_radiogroup_to_panel(gait_panel, &m_gait_idx, -1, (GLUI_Update_CB)GaitsChanged);
 	// Determine how many gaits we have.
 	int walk_index = 0;
 	int ind = 0;
-	for (std::vector<std::string>::iterator it = m_gaits.begin(); it != m_gaits.end(); ++it) {
+	for (std::vector<std::string>::iterator it = m_WalkingController->m_gaits.begin(); it != m_WalkingController->m_gaits.end(); ++it) {
 		std::string gait_name = *it;
 		m_glui_window->add_radiobutton_to_group(m_GaitsRadioGroup, gait_name.c_str());
 		if (strcmp(gait_name.c_str(), "Walk") == 0) {
@@ -410,8 +404,6 @@ void RagDollApplication::CreateRagDollGUI() {
 		ind++;
 	}
 	m_GaitsRadioGroup->set_int_val(walk_index);
-	m_previousGait = walk_index;
-	m_currentGait = walk_index;
 
 	m_glui_window->add_separator();
 
@@ -421,9 +413,9 @@ void RagDollApplication::CreateRagDollGUI() {
 	m_glui_window->add_statictext_to_panel(m_actionPanel, "Initial Gaits");
 	m_start_gait_lstbox = m_glui_window->add_listbox_to_panel(m_actionPanel, "Start Gait ", 0, -1);
 	m_end_gait_lstbox = m_glui_window->add_listbox_to_panel(m_actionPanel, "End Gait ", 0, -1);
-	for (int i = 0; i < m_gaits.size(); i++) {
-		m_start_gait_lstbox->add_item(i, m_gaits.at(i).c_str());
-		m_end_gait_lstbox->add_item(i, m_gaits.at(i).c_str());
+	for (int i = 0; i < m_WalkingController->m_gaits.size(); i++) {
+		m_start_gait_lstbox->add_item(i, m_WalkingController->m_gaits.at(i).c_str());
+		m_end_gait_lstbox->add_item(i, m_WalkingController->m_gaits.at(i).c_str());
 	}
 
 	m_start_gait_lstbox->set_int_val(0);
@@ -617,20 +609,20 @@ void RagDollApplication::EnableGainSpinners() {
 void RagDollApplication::SaveStates() {
 	ChangeState(-1);
 	// Save States into file
-	m_WalkingController->SaveStates(m_gaits.at(m_currentGait));
+	m_WalkingController->SaveStates(m_WalkingController->m_currentGait);
 }
 
 void RagDollApplication::SaveGains(){
 	// Save gains into file
-	m_WalkingController->SaveGains(m_gaits.at(m_currentGait));
+	m_WalkingController->SaveGains(m_WalkingController->m_currentGait);
 }
 
 void RagDollApplication::SaveFeedback() {
-	m_WalkingController->SaveFeedback(m_gaits.at(m_currentGait));
+	m_WalkingController->SaveFeedback(m_WalkingController->m_currentGait);
 }
 
 void RagDollApplication::SaveTime() {
-	m_WalkingController->SaveTime(m_gaits.at(m_currentGait));
+	m_WalkingController->SaveTime(m_WalkingController->m_currentGait);
 }
 
 void RagDollApplication::Reset() {
@@ -729,10 +721,9 @@ void RagDollApplication::ChangeState(int id) {
 
 void RagDollApplication::ChangeGait() {
 
-	printf("Previous gate: %s, Current Gait: %s \n", m_gaits.at(m_previousGait).c_str(), m_gaits.at(m_currentGait).c_str());
+	printf("Previous gate: %s, New gait: %s \n", m_WalkingController->m_currentGait.c_str(), m_WalkingController->m_gaits.at(m_gait_idx).c_str());
 
-	m_previousGait = m_currentGait;
-	m_WalkingController->ChangeGait(m_gaits.at(m_currentGait));
+	m_WalkingController->ChangeGait(m_WalkingController->m_gaits.at(m_gait_idx));
 	SetupGUIConfiguration();
 	DisplayState(m_currentState);
 
@@ -749,8 +740,8 @@ void RagDollApplication::UpdateTime() {
 
 void RagDollApplication::BeginAction() {
 
-	std::string begin_gait = m_gaits.at(m_start_gait_lstbox->get_int_val());
-	std::string end_gait = m_gaits.at(m_end_gait_lstbox->get_int_val());
+	std::string begin_gait = m_WalkingController->m_gaits.at(m_start_gait_lstbox->get_int_val());
+	std::string end_gait = m_WalkingController->m_gaits.at(m_end_gait_lstbox->get_int_val());
 
 	switch (m_action_radiogroup->get_int_val())
 	{
@@ -791,7 +782,14 @@ void RagDollApplication::EndAction() {
 	m_begin_button->enable();
 }
 
+void RagDollApplication::AddGait(std::string gait_name) {
 
+	// Add to gaits
+	m_glui_window->add_radiobutton_to_group(m_GaitsRadioGroup, gait_name.c_str());
+
+	// Add to dropdown list
+
+}
 
 #pragma endregion GUI
 
@@ -894,8 +892,6 @@ void RagDollApplication::UpdateRagDoll() {
 		btQuaternion(btVector3(0, 0, 1), lrlAngle));
 	Debug("LRL COM (" << m_lowerRightLeg->GetCOMPosition().x() << ", " << m_lowerRightLeg->GetCOMPosition().y() << ", " << m_lowerRightLeg->GetCOMPosition().z(), ")");
 
-	//printf("lower right leg angle = %f, orientation = %f\n", Constants::GetInstance().RadiansToDegrees(lrlAngle), m_lowerRightLeg->GetOrientation());
-
 	btVector3 upperLeftLegBottomPoint = m_upperLeftLeg->GetCOMPosition() + btVector3(sin(ullAngle) * upper_leg_height / 2, -cos(ullAngle) * upper_leg_height / 2, 0);
 	
 	m_lowerLeftLeg->Reposition(
@@ -911,16 +907,7 @@ void RagDollApplication::UpdateRagDoll() {
 		btQuaternion(btVector3(0, 0, 1), rfAngle));
 	Debug("RF COM (" << m_rightFoot->GetCOMPosition().x() << ", " << m_rightFoot->GetCOMPosition().y() << ", " << m_rightFoot->GetCOMPosition().z() << ")");
 	
-	//printf("right foot angle = %f, orientation = %f\n", Constants::GetInstance().RadiansToDegrees(rfAngle), m_rightFoot->GetOrientation());
-
-	//printf("ULL BP position: %f, %f\n", upperLeftLegBottomPoint.x(), upperLeftLegBottomPoint.y());
-	// Yellow
-	//m_lowerLeftLeg->Reposition(upperLeftLegBottomPoint + btVector3(0.0f, -lower_leg_height / 2, 0.1), btQuaternion(btVector3(0, 0, 1), lllAngle));
-	
-	
 	btVector3 lowerLeftLegBottomPoint = m_lowerLeftLeg->GetCOMPosition() + btVector3(sin(lllAngle) * lower_leg_height / 2, -cos(lllAngle) * lower_leg_height / 2, 0);
-
-	//printf("Before: lf orientation = %f, lfAngle = %f\n", m_leftFoot->GetOrientation(), Constants::GetInstance().RadiansToDegrees(lfAngle));
 
 	m_leftFoot->Reposition(
 		lowerLeftLegBottomPoint + btVector3(cos(lfAngle) * foot_width / 4, sin(lfAngle) * foot_width / 4, -0.1),
@@ -928,8 +915,6 @@ void RagDollApplication::UpdateRagDoll() {
 	
 	//printf("After: lf orientation = %f, lfAngle = %f\n", m_leftFoot->GetOrientation(), Constants::GetInstance().RadiansToDegrees(lfAngle));
 	Debug("LF COM (" << m_leftFoot->GetCOMPosition().x() << ", " << m_leftFoot->GetCOMPosition().y() << ", " << m_leftFoot->GetCOMPosition().z() << ")");
-
-	//GameObject::PrintOrientations(m_bodies);
 
 }
 

@@ -1,8 +1,14 @@
 #pragma once
 
 #include<string>
+#include "LinearMath\btVector3.h"
+#include <functional>
+#include <vector>
+
 class WalkingController;
 class RagDollApplication;
+
+using namespace std::placeholders;
 
 class PolationManager
 {
@@ -12,6 +18,8 @@ public:
 
 	virtual void Begin(std::string begin_gait, std::string end_gait, std::string gait_name);
 	virtual void End();
+
+	virtual void RecordStates(std::vector<btVector3> linVec, std::vector<btVector3> linPos, std::vector<float> angVec, std::vector<float> angPos);
 
 
 protected:

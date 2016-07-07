@@ -1,5 +1,8 @@
 #pragma once
 #include "PolationManager.h"
+
+class Gait;
+
 class InterpolationManager :
 	public PolationManager
 {

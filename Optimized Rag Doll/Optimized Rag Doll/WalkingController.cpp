@@ -29,6 +29,8 @@ WalkingController::WalkingController(RagDollApplication *app) {
 	m_COMPosition = btVector3(0, 0, 0);
 	m_stanceAnklePosition = btVector3(0, 0, 0);
 
+	GetGaits();
+
 }
 
 std::vector<std::string> WalkingController::GetGaits() {
@@ -62,6 +64,7 @@ std::vector<std::string> WalkingController::GetGaits() {
 		}
 		closedir(dir);
 	}
+	m_gaits = gaits;
 	return gaits;
 }
 
@@ -514,6 +517,38 @@ void WalkingController::StateLoop() {
 				m_clock.reset();
 				m_duration = 0;
 				m_reset = true;
+
+				try {
+					std::vector<btVector3> linearVelocities = {
+						m_app->m_torso->GetLinearVelocity(),
+						m_app->m_upperLeftLeg->GetLinearVelocity(), m_app->m_upperRightLeg->GetLinearVelocity(),
+						m_app->m_lowerLeftLeg->GetLinearVelocity(), m_app->m_lowerRightLeg->GetLinearVelocity(),
+						m_app->m_leftFoot->GetLinearVelocity(), m_app->m_rightFoot->GetLinearVelocity()
+					};
+					std::vector<btVector3> linearPositions = {
+						m_app->m_torso->GetCOMPosition(),
+						m_app->m_upperLeftLeg->GetCOMPosition(), m_app->m_upperRightLeg->GetCOMPosition(),
+						m_app->m_lowerLeftLeg->GetCOMPosition(), m_app->m_lowerRightLeg->GetCOMPosition(),
+						m_app->m_leftFoot->GetCOMPosition(), m_app->m_rightFoot->GetCOMPosition()
+					};
+					std::vector<float> angularVelocities = {
+						m_app->m_torso->GetAngularVelocity(),
+						m_app->m_upperLeftLeg->GetAngularVelocity(), m_app->m_upperRightLeg->GetAngularVelocity(),
+						m_app->m_lowerLeftLeg->GetAngularVelocity(), m_app->m_lowerRightLeg->GetAngularVelocity(),
+						m_app->m_leftFoot->GetAngularVelocity(), m_app->m_rightFoot->GetAngularVelocity()
+					};
+					std::vector<float> angularPositions = {
+						m_app->m_torso->GetOrientation(),
+						m_app->m_upperLeftLeg->GetOrientation(), m_app->m_upperRightLeg->GetOrientation(),
+						m_app->m_lowerLeftLeg->GetOrientation(), m_app->m_lowerRightLeg->GetOrientation(),
+						m_app->m_leftFoot->GetOrientation(), m_app->m_rightFoot->GetOrientation()
+					};
+					m_BodyStateCallback(linearVelocities, linearPositions, angularVelocities, angularPositions);
+				}
+				catch (const std::bad_function_call& e) {
+					
+				}
+
 				printf("==============================\n~*~*~*~*~*~*~*~*~*~ STATE 1 ~*~*~*~*~*~*~*~*~*~\n");
 			}
 			else {
@@ -683,12 +718,43 @@ void WalkingController::ChangeGait(std::string gait) {
 
 #pragma endregion WALKER_INTERACTION
 
-void WalkingController::SetGait(Gait gait, std::string gait_name) {
+void WalkingController::AddGait(Gait gait, std::string gait_name) {
 	// Make entry in maps for new gait.
+	// States
+	std::vector<State *>states;
+	for (int i = 0; i < gait.GetStates().size(); i++) {
+		State x = gait.GetStates().at(i);
+		State *s = new State(x.m_torsoAngle, x.m_upperLeftLegAngle, x.m_upperRightLegAngle, x.m_lowerLeftLegAngle, x.m_lowerRightLegAngle, x.m_leftFootAngle, x.m_rightFootAngle);
+		states.push_back(s);
+	}
+
+	// Gains
+	std::vector<Gains *> gains;
+	for (int i = 0; i < gait.GetGains().size(); i++) {
+		Gains x = gait.GetGains().at(i);
+		Gains *g = new Gains(x.m_kp, x.m_kd, (AssociatedBody)i);
+		gains.push_back(g);
+	}
+
+	// Feedback
+	std::vector<float> fdbks;
+	for (int i = 0; i < gait.GetFdbk().size(); i++) {
+		fdbks.push_back(gait.GetFdbk().at(i));
+	}
+
+	// time
+	float state_time = gait.GetStateTime();
+
+	// Put everything into maps.
+	m_GaitMap.insert(std::pair<std::string, std::vector<State *>>(gait_name, states));
+	m_GainMap.insert(std::pair<std::string, std::vector<Gains *>>(gait_name, gains));
+	m_FdbkMap.insert(std::pair<std::string, std::vector<float>>(gait_name, fdbks));
+	m_TmMap.insert(std::pair<std::string, float>(gait_name, state_time));
+
 
 }
 
-void WalkingController::SetCallbackFunction(std::function<void(std::vector<float> linearVelocities, std::vector<float> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> func) {
+void WalkingController::SetCallbackFunction(std::function<void(std::vector<btVector3> linearVelocities, std::vector<btVector3> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> func) {
 
 	m_BodyStateCallback = func;
 

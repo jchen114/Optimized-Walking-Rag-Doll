@@ -14,7 +14,7 @@ InterpolationManager::~InterpolationManager()
 {
 }
 
-void InterpolationManager::Begin(std::string begin_gait, std::string end_gait, std::string gait_name = "Interpolate") {
+void InterpolationManager::Begin(std::string begin_gait, std::string end_gait, std::string gait_name) {
 	PolationManager::Begin(begin_gait, end_gait, gait_name);
 	printf("Interpolation Begin \n");
 
@@ -29,9 +29,10 @@ void InterpolationManager::Begin(std::string begin_gait, std::string end_gait, s
 	Gait interpolated_gait = Interpolate(beginning_gait, ending_gait);
 
 	// Give new gait to Walking Controller
-	
+	m_WalkingController->SetGait(interpolated_gait, gait_name);
 	// Register callback with Walking Controller to save body states
-
+	m_WalkingController->SetCallbackFunction(std::bind(&InterpolationManager::RecordStates, this, _1, _2, _3, _4));
+	m_WalkingController->ChangeGait(m_gaitName);
 	// Tell Rag Doll to start walking
 
 }

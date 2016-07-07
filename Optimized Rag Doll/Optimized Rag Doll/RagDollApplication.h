@@ -6,7 +6,8 @@
 class WalkingController;
 class State;
 class Gains;
-class PolationManager;
+class InterpolationManager;
+class ExtrapolationManager;
 
 class RagDollApplication :
 	public BulletOpenGLApplication
@@ -77,6 +78,7 @@ public:
 	void UpdateTime();
 	void BeginAction();
 	void EndAction();
+	void AddGait(std::string gait_name);
 
 	void SetupGUIConfiguration();
 
@@ -116,8 +118,7 @@ private:
 	int m_currentState = 0;
 	int m_previousState = 0;
 
-	int m_currentGait;
-	int m_previousGait;
+	int m_gait_idx = 0;
 
 	std::vector<GameObject *> m_bodies;
 
@@ -127,9 +128,6 @@ private:
 	btHingeConstraint *m_ulLeg_llLeg;
 	btHingeConstraint *m_lrLeg_rFoot;
 	btHingeConstraint *m_llLeg_lFoot;
-
-	// Gaits
-	std::vector<std::string> m_gaits;
 
 	void CreateRagDollGUI();
 
@@ -191,8 +189,8 @@ private:
 	bool m_drawBackForce = false;
 	bool m_drawForwardForce = false;
 
-	PolationManager *m_interp_mgr;
-	PolationManager *m_extrap_mgr;
+	InterpolationManager *m_interp_mgr;
+	ExtrapolationManager *m_extrap_mgr;
 
 };
 

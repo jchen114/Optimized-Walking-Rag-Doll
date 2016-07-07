@@ -28,3 +28,9 @@ void PolationManager::Begin(std::string begin_gait, std::string end_gait, std::s
 void PolationManager::End() {
 
 }
+
+void PolationManager::RecordStates(std::vector<btVector3> linVec, std::vector<btVector3> linPos, std::vector<float> angVec, std::vector<float> angPos) {
+
+	printf("Recording state\n");
+
+}
