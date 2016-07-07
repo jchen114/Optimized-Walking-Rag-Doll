@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "ExtrapolationManager.h"
+#include "Gait.h"
 
-
-ExtrapolationManager::ExtrapolationManager()
+ExtrapolationManager::ExtrapolationManager(WalkingController *walkingController, RagDollApplication *ragDollApplication) :PolationManager(walkingController, ragDollApplication)
 {
 }
 
@@ -11,8 +11,9 @@ ExtrapolationManager::~ExtrapolationManager()
 {
 }
 
-void ExtrapolationManager::Begin() {
+void ExtrapolationManager::Begin(std::string begin_gait, std::string end_gait, std::string gait_name = "extrapolate") {
 	printf("Extrapolation Begin\n");
+	PolationManager::Begin(begin_gait, end_gait, gait_name);
 }
 
 void ExtrapolationManager::End() {

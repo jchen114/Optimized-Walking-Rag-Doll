@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "Gait.h"
+
 WalkingController::WalkingController()
 {
 }
@@ -601,6 +603,22 @@ void WalkingController::NotifyTorsoGroundContact() {
 	m_torsoHasContacted = true;
 }
 
+Gait WalkingController::GetGait(std::string gait_name) {
+	std::vector<State*> states = m_GaitMap.find(gait_name)->second;
+	std::vector<Gains*> gains = m_GainMap.find(gait_name)->second;
+	std::vector<float> feedbacks = m_FdbkMap.find(gait_name)->second;
+	float time = m_TmMap.find(gait_name)->second;
+
+	Gait gait(
+		*states.at(0), *states.at(1), *states.at(2), *states.at(3), *states.at(4),
+		*gains.at(0), *gains.at(1), *gains.at(2), *gains.at(3), *gains.at(4), *gains.at(5), *gains.at(6),
+		feedbacks.at(0), feedbacks.at(1), feedbacks.at(2), feedbacks.at(3),
+		time
+		);
+
+	return gait;
+}
+
 void WalkingController::ChangeGait(std::string gait) {
 
 	printf("Gait is now %s\n", gait.c_str());
@@ -664,6 +682,17 @@ void WalkingController::ChangeGait(std::string gait) {
 }
 
 #pragma endregion WALKER_INTERACTION
+
+void WalkingController::SetGait(Gait gait, std::string gait_name) {
+	// Make entry in maps for new gait.
+
+}
+
+void WalkingController::SetCallbackFunction(std::function<void(std::vector<float> linearVelocities, std::vector<float> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> func) {
+
+	m_BodyStateCallback = func;
+
+}
 
 #pragma region GAINS
 
@@ -842,7 +871,7 @@ std::vector<float> WalkingController::CalculateState3Torques() {
 	// SWING
 	float feedbackTargetAngle = CalculateFeedbackSwingHip();
 	float upperLeftLegTorque = CalculateTorqueForUpperLeftLeg(feedbackTargetAngle, m_app->m_upperLeftLeg->GetOrientation(), m_app->m_upperLeftLeg->GetAngularVelocity());
-	//printf("ULL: desired = %f, current = %f, torque = %f \n", feedbackTargetAngle, m_app->m_upperLeftLeg->GetOrientation(), upperLeftLegTorque);
+	
 	// STANCE
 	float upperRightLegTorque = -torsoTorque - upperLeftLegTorque;
 	//printf("URL torque = %f\n", upperRightLegTorque);
@@ -850,10 +879,6 @@ std::vector<float> WalkingController::CalculateState3Torques() {
 	/* ==================== Calculating torque for Lower Legs ======================= */
 	float lowerLeftLegTorque = CalculateTorqueForLowerLeftLeg(m_app->m_upperLeftLeg->GetOrientation() - m_state3->m_lowerLeftLegAngle, m_app->m_lowerLeftLeg->GetOrientation(), m_app->m_lowerLeftLeg->GetAngularVelocity());
 	float lowerRightLegTorque = CalculateTorqueForLowerRightLeg(m_app->m_upperRightLeg->GetOrientation() - m_state3->m_lowerRightLegAngle, m_app->m_lowerRightLeg->GetOrientation(), m_app->m_lowerRightLeg->GetAngularVelocity());
-
-	//printf("****************************** \n url: orientation = %f\n lrl: orientation: %f \n", m_app->m_upperRightLeg->GetOrientation(), m_app->m_lowerRightLeg->GetOrientation());
-
-	//printf("lrl: angle = %f, orientation = %f\n", m_state1->m_lowerRightLegAngle, m_app->m_upperRightLeg->GetOrientation() - m_app->m_lowerRightLeg->GetOrientation());
 
 	/* ==================== Calculating torque for Feet ======================= */
 	float leftFootTorque = CalculateTorqueForLeftFoot(
@@ -889,10 +914,6 @@ std::vector<float> WalkingController::CalculateState4Torques() {
 	float lowerLeftLegTorque = CalculateTorqueForLowerLeftLeg(m_app->m_upperLeftLeg->GetOrientation() - m_state4->m_lowerLeftLegAngle, m_app->m_lowerLeftLeg->GetOrientation(), m_app->m_lowerLeftLeg->GetAngularVelocity());
 	float lowerRightLegTorque = CalculateTorqueForLowerRightLeg(m_app->m_upperRightLeg->GetOrientation() - m_state4->m_lowerRightLegAngle, m_app->m_lowerRightLeg->GetOrientation(), m_app->m_lowerRightLeg->GetAngularVelocity());
 
-	//printf("****************************** \n url: orientation = %f\n lrl: orientation: %f \n", m_app->m_upperRightLeg->GetOrientation(), m_app->m_lowerRightLeg->GetOrientation());
-
-	//printf("lrl: angle = %f, orientation = %f\n", m_state1->m_lowerRightLegAngle, m_app->m_upperRightLeg->GetOrientation() - m_app->m_lowerRightLeg->GetOrientation());
-
 	/* ==================== Calculating torque for Feet ======================= */
 	float leftFootTorque = CalculateTorqueForLeftFoot(
 		m_app->m_lowerLeftLeg->GetOrientation() - m_state4->m_leftFootAngle,
@@ -903,8 +924,7 @@ std::vector<float> WalkingController::CalculateState4Torques() {
 		m_app->m_rightFoot->GetOrientation(),
 		m_app->m_rightFoot->GetAngularVelocity());
 
-	//std::cout << "Torques Before (ULL-swing: " << upperLeftLegTorque << ", URL-stance: " << upperRightLegTorque << ", LLL: " << lowerLeftLegTorque << ", LRL: " << lowerRightLegTorque << ", LF: " << leftFootTorque << ", RF: " << rightFootTorque << std::endl;
-	//std::cout << "Torques After (ULL-swing: " << upperLeftLegTorque - lowerLeftLegTorque << ", URL-stance: " << upperRightLegTorque - lowerRightLegTorque << ", LLL: " << lowerLeftLegTorque - leftFootTorque << ", LRL: " << lowerRightLegTorque  - rightFootTorque << ", LF: " << leftFootTorque << ", RF: " << rightFootTorque << std::endl;
+
 	torques = { upperLeftLegTorque - lowerLeftLegTorque, upperRightLegTorque - lowerRightLegTorque, lowerLeftLegTorque - leftFootTorque, lowerRightLegTorque - rightFootTorque, leftFootTorque, rightFootTorque };
 	return torques;
 }
@@ -922,10 +942,7 @@ float WalkingController::CalculateFeedbackSwingHip() {
 		+ btVector3(sin(Constants::GetInstance().DegreesToRadians(m_app->m_torso->GetOrientation())) * torso_height / 2,
 		-cos(Constants::GetInstance().DegreesToRadians(m_app->m_torso->GetOrientation())) * torso_height / 2,
 		0);
-	/*btVector3 hipPosition = m_app->m_upperRightLeg->GetCOMPosition()
-		+ btVector3(cos(Constants::GetInstance().DegreesToRadians(m_app->m_upperRightLeg->GetOrientation())) * upper_leg_height / 2,
-		+sin(Constants::GetInstance().DegreesToRadians(m_app->m_upperRightLeg->GetOrientation())) * upper_leg_height / 2,
-		0);*/
+
 	switch (m_ragDollState)
 	{
 	case STATE_0: {

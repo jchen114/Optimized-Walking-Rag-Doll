@@ -10,7 +10,7 @@
 class RagDollApplication;
 class State;
 class Gains;
-
+class Gait;
 
 #pragma region DEFINITIONS 
 
@@ -125,6 +125,9 @@ public:
 	void NotifyTorsoGroundContact();
 	void ChangeGait(std::string gait);
 
+	void SetGait(Gait gait, std::string gait_name);
+	void SetCallbackFunction(std::function<void(std::vector<float> linearVelocities, std::vector<float> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> func);
+
 	void SetState1(float torso, float upperLeftLeg, float upperRightLeg, float lowerLeftLeg, float lowerRightLeg, float leftFoot, float rightFoot);
 	void SetState2(float torso, float upperLeftLeg, float upperRightLeg, float lowerLeftLeg, float lowerRightLeg, float leftFoot, float rightFoot);
 	void SetState3(float torso, float upperLeftLeg, float upperRightLeg, float lowerLeftLeg, float lowerRightLeg, float leftFoot, float rightFoot);
@@ -143,6 +146,8 @@ public:
 
 	void SetStateTime(float time);
 
+	Gait GetGait(std::string gait_name);
+
 	CurrentControllerState m_currentState = RESET;
 	CurrentRagDollState m_ragDollState = STATE_0;
 
@@ -154,7 +159,6 @@ public:
 	std::unordered_map<std::string, std::vector<float>> m_FdbkMap;
 	std::unordered_map<std::string, float> m_TmMap;
 
-	// Set these in the GUI
 	Gains *m_torso_gains;
 	Gains *m_ull_gains;
 	Gains *m_url_gains;
@@ -231,5 +235,8 @@ private:
 	float CalculateTorqueForRightFoot(float targetPosition, float currentPosition, float currentVelocity);
 
 	float CalculateTorque(float kp, float kd, float targetPosition, float currentPosition, float velocity);
+
+	std::function<void(std::vector<float> linearVelocities, std::vector<float> linearPositions, std::vector<float> angularVelocities, std::vector<float> angularPositions)> m_BodyStateCallback;
+
 
 };

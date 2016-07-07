@@ -4,10 +4,10 @@ class ExtrapolationManager :
 	public PolationManager
 {
 public:
-	ExtrapolationManager();
+	ExtrapolationManager(WalkingController *m_WalkingController, RagDollApplication *ragDollApplication);
 	~ExtrapolationManager();
 
-	virtual void Begin() override;
+	virtual void Begin(std::string begin_gait, std::string end_gait, std::string gait_name = "extrapolate") override;
 	virtual void End() override;
 
 };

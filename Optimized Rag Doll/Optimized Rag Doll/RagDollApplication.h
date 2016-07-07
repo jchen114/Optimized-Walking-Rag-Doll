@@ -177,6 +177,8 @@ private:
 	GLUI_Listbox *m_start_gait_lstbox;
 	GLUI_Listbox *m_end_gait_lstbox;
 	GLUI_RadioGroup *m_action_radiogroup;	
+	GLUI_Button *m_begin_button;
+	GLUI_Button *m_end_button;
 
 	GLUI_Panel *m_actionPanel;
 

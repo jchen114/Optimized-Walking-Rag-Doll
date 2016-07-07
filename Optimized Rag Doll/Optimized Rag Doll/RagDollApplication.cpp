@@ -53,8 +53,8 @@ RagDollApplication::RagDollApplication(ProjectionMode mode, bool isFrameRateFixe
 	m_app = this;
 	m_DrawCallback = std::bind(&RagDollApplication::DrawDebugFeedback, this);
 	m_DrawShapeCallback = std::bind(&RagDollApplication::DrawShape, this, _1, _2, _3);
-	m_interp_mgr = new InterpolationManager();
-	m_extrap_mgr = new ExtrapolationManager();
+	m_interp_mgr = new InterpolationManager(m_WalkingController, this);
+	m_extrap_mgr = new ExtrapolationManager(m_WalkingController, this);
 }
 
 RagDollApplication::~RagDollApplication()
@@ -437,8 +437,8 @@ void RagDollApplication::CreateRagDollGUI() {
 
 	m_glui_window->add_separator_to_panel(m_actionPanel);
 
-	m_glui_window->add_button_to_panel(m_actionPanel, "Begin", -1, (GLUI_Update_CB) BeginButtonPressed);
-	m_glui_window->add_button_to_panel(m_actionPanel, "Stop", -1 , (GLUI_Update_CB) StopButtonPressed);
+	m_begin_button = m_glui_window->add_button_to_panel(m_actionPanel, "Begin", -1, (GLUI_Update_CB) BeginButtonPressed);
+	m_end_button = m_glui_window->add_button_to_panel(m_actionPanel, "Stop", -1 , (GLUI_Update_CB) StopButtonPressed);
 
 }
 
@@ -748,22 +748,28 @@ void RagDollApplication::UpdateTime() {
 }
 
 void RagDollApplication::BeginAction() {
+
+	std::string begin_gait = m_gaits.at(m_start_gait_lstbox->get_int_val());
+	std::string end_gait = m_gaits.at(m_end_gait_lstbox->get_int_val());
+
 	switch (m_action_radiogroup->get_int_val())
 	{
 	case 0: {
 		// Interpolate
-		m_interp_mgr->Begin();
+		m_interp_mgr->Begin(begin_gait, end_gait);
 	}
 		break;
 	case 1: {
 		// Extrapolate
-		m_extrap_mgr->Begin();
+		m_extrap_mgr->Begin(begin_gait, end_gait);
 	}
 		break;
 	default:
 		break;
 	}
-	m_actionPanel->disable();
+
+	m_begin_button->disable();
+
 }
 
 void RagDollApplication::EndAction() {
@@ -782,7 +788,7 @@ void RagDollApplication::EndAction() {
 	default:
 		break;
 	}
-	m_actionPanel->enable();
+	m_begin_button->enable();
 }
 
 
