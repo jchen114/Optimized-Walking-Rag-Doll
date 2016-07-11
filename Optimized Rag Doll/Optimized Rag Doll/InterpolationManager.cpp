@@ -3,6 +3,7 @@
 #include "Gait.h"
 
 #include "WalkingController.h"
+#include "RagDollApplication.h"
 
 InterpolationManager::InterpolationManager(WalkingController *walkingController, RagDollApplication *ragDollApp):PolationManager(walkingController, ragDollApp)
 {
@@ -18,6 +19,8 @@ void InterpolationManager::Begin(std::string begin_gait, std::string end_gait, s
 	PolationManager::Begin(begin_gait, end_gait, gait_name);
 	printf("Interpolation Begin \n");
 
+	// Check here if the gait name already exists. If it does, then pop up some message.
+
 	// Ask WalkingController for begin gaits and end gaits
 	// Interpolation manager: Hello Walking controller, may I have the gait named "_____".
 	// Walking Controller: Sure, here you go.
@@ -29,16 +32,23 @@ void InterpolationManager::Begin(std::string begin_gait, std::string end_gait, s
 	Gait interpolated_gait = Interpolate(beginning_gait, ending_gait);
 
 	// Give new gait to Walking Controller
-	m_WalkingController->SetGait(interpolated_gait, gait_name);
+	m_WalkingController->AddGait(interpolated_gait, gait_name);
 	// Register callback with Walking Controller to save body states
 	m_WalkingController->SetCallbackFunction(std::bind(&InterpolationManager::RecordStates, this, _1, _2, _3, _4));
 	m_WalkingController->ChangeGait(m_gaitName);
+	// Save everything
+	m_RagDollApp->SaveStates();
+	m_RagDollApp->SaveGains();
+	m_RagDollApp->SaveFeedback();
+	m_RagDollApp->SaveTime();
 	// Tell Rag Doll to start walking
+	//m_RagDollApp->Start();
 
 }
 
 void InterpolationManager::End() {
 	printf("Interpolation End \n");
+	m_RagDollApp->Reset();
 }
 
 Gait InterpolationManager::Interpolate(const Gait &begin_gait, const Gait &end_gait) {

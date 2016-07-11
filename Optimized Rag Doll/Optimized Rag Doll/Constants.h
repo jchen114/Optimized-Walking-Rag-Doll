@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <sys/stat.h>
 
 enum ProjectionMode{ ORTHOGRAPHIC, PERSPECTIVE };
 enum Dimension{ HEIGHT, WIDTH };
@@ -42,6 +44,16 @@ public:
 
 	float DegreesToRadians(float degrees);
 	float RadiansToDegrees(float radians);
+
+	bool FileExists(const std::string& filename)
+	{
+		struct stat buf;
+		if (stat(filename.c_str(), &buf) != -1)
+		{
+			return true;
+		}
+		return false;
+	}
 
 	// Frame Rate
 	int m_StartTime;

@@ -53,8 +53,6 @@ RagDollApplication::RagDollApplication(ProjectionMode mode, bool isFrameRateFixe
 	m_app = this;
 	m_DrawCallback = std::bind(&RagDollApplication::DrawDebugFeedback, this);
 	m_DrawShapeCallback = std::bind(&RagDollApplication::DrawShape, this, _1, _2, _3);
-	m_interp_mgr = new InterpolationManager(m_WalkingController, this);
-	m_extrap_mgr = new ExtrapolationManager(m_WalkingController, this);
 }
 
 RagDollApplication::~RagDollApplication()
@@ -106,6 +104,9 @@ void RagDollApplication::InitializePhysics() {
 	m_pWorld->setInternalTickCallback(InternalPostTickCallback, 0, false);
 
 	m_previous_torso_position = m_WalkingController->m_COMPosition;
+
+	m_interp_mgr = new InterpolationManager(m_WalkingController, this);
+	m_extrap_mgr = new ExtrapolationManager(m_WalkingController, this);
 
 }
 
@@ -743,6 +744,8 @@ void RagDollApplication::BeginAction() {
 	std::string begin_gait = m_WalkingController->m_gaits.at(m_start_gait_lstbox->get_int_val());
 	std::string end_gait = m_WalkingController->m_gaits.at(m_end_gait_lstbox->get_int_val());
 
+	printf("begin gait: %s, end gait: %s \n", begin_gait.c_str(), end_gait.c_str());
+
 	switch (m_action_radiogroup->get_int_val())
 	{
 	case 0: {
@@ -788,6 +791,8 @@ void RagDollApplication::AddGait(std::string gait_name) {
 	m_glui_window->add_radiobutton_to_group(m_GaitsRadioGroup, gait_name.c_str());
 
 	// Add to dropdown list
+	m_start_gait_lstbox->add_item(m_WalkingController->m_gaits.size(), gait_name.c_str());
+	m_end_gait_lstbox->add_item(m_WalkingController->m_gaits.size(), gait_name.c_str());
 
 }
 
