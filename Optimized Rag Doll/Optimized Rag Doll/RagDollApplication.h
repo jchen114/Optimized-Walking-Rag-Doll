@@ -66,6 +66,7 @@ public:
 	void CloseGLUIWindow(int id);
 	void ChangeState(int id);
 	void ChangeGait();
+	void ChangeGait(std::string gait_name);
 	void ChangeTorsoAngle();
 	void ChangeUpperLeftLegAngle();
 	void ChangeUpperRightLegAngle();
@@ -77,7 +78,6 @@ public:
 	void UpdateFeedbacks();
 	void UpdateTime();
 	void BeginAction();
-	void EndAction();
 	void AddGait(std::string gait_name);
 
 	void SetupGUIConfiguration();
@@ -179,6 +179,7 @@ private:
 	GLUI_Button *m_end_button;
 
 	GLUI_Panel *m_actionPanel;
+	GLUI_EditText *m_editText;
 
 	int m_draw = 0;
 	char buf[1000];
@@ -222,7 +223,6 @@ static void FeedbackChanged(int id);
 static void TimeChanged(int id);
 
 static void BeginButtonPressed(int id);
-static void StopButtonPressed(int id);
 
 /* Bullet Physics Tick callback */
 void InternalPreTickCallback(btDynamicsWorld *world, btScalar timestep);

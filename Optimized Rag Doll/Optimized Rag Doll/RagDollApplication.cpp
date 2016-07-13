@@ -422,7 +422,7 @@ void RagDollApplication::CreateRagDollGUI() {
 	m_start_gait_lstbox->set_int_val(0);
 	m_end_gait_lstbox->set_int_val(0);
 
-	m_glui_window->add_edittext_to_panel(m_actionPanel, "Gait Name", GLUI_EDITTEXT_STRING);
+	m_editText = m_glui_window->add_edittext_to_panel(m_actionPanel, "Gait Name", GLUI_EDITTEXT_STRING);
 
 	m_action_radiogroup = m_glui_window->add_radiogroup_to_panel(m_actionPanel, 0, -1);
 	m_glui_window->add_radiobutton_to_group(m_action_radiogroup, "Interpolate");
@@ -431,7 +431,6 @@ void RagDollApplication::CreateRagDollGUI() {
 	m_glui_window->add_separator_to_panel(m_actionPanel);
 
 	m_begin_button = m_glui_window->add_button_to_panel(m_actionPanel, "Begin", -1, (GLUI_Update_CB) BeginButtonPressed);
-	m_end_button = m_glui_window->add_button_to_panel(m_actionPanel, "Stop", -1 , (GLUI_Update_CB) StopButtonPressed);
 
 }
 
@@ -734,6 +733,21 @@ void RagDollApplication::ChangeGait() {
 
 }
 
+void RagDollApplication::ChangeGait(std::string gait_name) {
+
+	int pos = std::find(m_WalkingController->m_gaits.begin(), m_WalkingController->m_gaits.end(), gait_name) - m_WalkingController->m_gaits.begin();
+	printf("Change to gait %s with pos %d\n", gait_name.c_str(), pos);
+	if (pos >= m_WalkingController->m_gaits.size()) {
+		return;
+	}
+	m_gait_idx = pos;
+	m_WalkingController->ChangeGait(m_WalkingController->m_gaits.at(pos));
+	SetupGUIConfiguration();
+	DisplayState(m_currentState);
+	m_GaitsRadioGroup->set_int_val(m_gait_idx);
+
+}
+
 void RagDollApplication::UpdateTime() {
 	m_WalkingController->SetStateTime(m_timer_spinner->get_float_val());
 	SetupGUIConfiguration();
@@ -746,43 +760,26 @@ void RagDollApplication::BeginAction() {
 
 	printf("begin gait: %s, end gait: %s \n", begin_gait.c_str(), end_gait.c_str());
 
+	std::string gait_name = m_editText->get_text();
+
 	switch (m_action_radiogroup->get_int_val())
 	{
 	case 0: {
 		// Interpolate
-		m_interp_mgr->Begin(begin_gait, end_gait);
+		gait_name.empty() ? m_interp_mgr->Begin(begin_gait, end_gait) : m_interp_mgr->Begin(begin_gait, end_gait, gait_name);
 	}
 		break;
 	case 1: {
 		// Extrapolate
-		m_extrap_mgr->Begin(begin_gait, end_gait);
+		gait_name.empty() ? m_extrap_mgr->Begin(begin_gait, end_gait) : m_extrap_mgr->Begin(begin_gait, end_gait, gait_name);
 	}
 		break;
-	default:
+	default:	
 		break;
 	}
 
 	m_begin_button->disable();
 
-}
-
-void RagDollApplication::EndAction() {
-	switch (m_action_radiogroup->get_int_val())
-	{
-	case 0: {
-		// Interpolate
-		m_interp_mgr->End();
-	}
-		break;
-	case 1: {
-		// Extrapolate
-		m_extrap_mgr->End();
-	}
-		break;
-	default:
-		break;
-	}
-	m_begin_button->enable();
 }
 
 void RagDollApplication::AddGait(std::string gait_name) {
@@ -1467,10 +1464,6 @@ static void TimeChanged(int id) {
 
 static void BeginButtonPressed(int id) {
 	m_app->BeginAction();
-}
-
-static void StopButtonPressed(int id) {
-	m_app->EndAction();
 }
 
 #pragma endregion GLUI_CALLBACKS
