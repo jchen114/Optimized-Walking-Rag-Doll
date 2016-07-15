@@ -10,6 +10,8 @@
 #include "ExtrapolationManager.h"
 #include "InterpolationManager.h"
 
+#include "SOIL.h"
+
 using namespace std::placeholders;
 
 #pragma region INITIALIZATION
@@ -108,6 +110,29 @@ void RagDollApplication::InitializePhysics() {
 	m_interp_mgr = new InterpolationManager(m_WalkingController, this);
 	m_extrap_mgr = new ExtrapolationManager(m_WalkingController, this);
 
+	m_trump_walking = SOIL_load_OGL_texture
+		(
+			"..\\..\\Dependencies\\resources\\trump_face_walking.jpg", 
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID, 
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+	if (0 == m_trump_walking)
+	{
+		printf("SOIL loading error: '%s'\n", SOIL_last_result());
+	}
+
+	m_trump_falling = SOIL_load_OGL_texture
+		(
+			"..\\..\\Dependencies\\resources\\trump_face_falling.jpg",
+			SOIL_LOAD_AUTO,
+			SOIL_CREATE_NEW_ID,
+			SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+		);
+	if (0 == m_trump_falling)
+	{
+		printf("SOIL loading error: '%s'\n", SOIL_last_result());
+	}
 }
 
 void RagDollApplication::Idle() {
@@ -1231,7 +1256,52 @@ void RagDollApplication::DrawTorso(const btVector3 &halfSize) {
 	DrawPartialFilledCircle(0, halfHeight,  shoulderRadius, 0, 180);
 	DrawPartialFilledCircle(0, -2*halfHeight, hipRadius, 180, 360);
 
+	DrawHead(0, 2.3f*halfHeight, 0.006f);
 }
+
+void RagDollApplication::DrawHead(float x, float y, float radius) {
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glTranslatef(0.5, 0.5, 0.0);
+	glRotatef(88.0f, 0.0, 0.0, 1.0);
+	glTranslatef(-0.5, -0.5, 0.0);
+	glMatrixMode(GL_MODELVIEW);
+
+	glEnable(GL_TEXTURE_2D);
+	
+	if (m_torso->GetOrientation() > 30.0f || m_torso->GetOrientation() < -30.0f)
+	{
+		// Draw falling face
+		glBindTexture(GL_TEXTURE_2D, m_trump_falling);
+	}
+	else {
+		// Draw walking face
+		glBindTexture(GL_TEXTURE_2D, m_trump_walking);
+	}
+	
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glBegin(GL_POLYGON);
+	
+	for (float angle = 0.0f; angle < 360.0; angle += 2.0)
+	{
+		
+		float radian = Constants::GetInstance().DegreesToRadians(angle);
+
+		float xcos = (float)cos(radian);
+		float ysin = (float)sin(radian);
+		x = xcos * radius + x;
+		y = ysin * radius + y;
+		float tx = xcos * 0.5 + 0.5;
+		float ty = ysin * 0.5 + 0.5;
+
+		glTexCoord2f(tx, ty);
+		glVertex2f(x, y);
+	}
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+}
+
 
 void RagDollApplication::DrawUpperLeg(const btVector3 &halfSize) {
 

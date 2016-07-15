@@ -72,9 +72,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_ITERATOR_DEBUG_LEVEL=0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_ITERATOR_DEBUG_LEVEL=0;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Program Files\boost\boost-1.61.0-vs2013\include\boost-1_61;$(ProjectDir)..\..\Dependencies\bullet3-2.83.7\src;$(ProjectDir)..\..\Dependencies\dirent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost-1.61.0-vs2013\include\boost-1_61;$(ProjectDir)..\..\Dependencies\bullet3-2.83.7\src;$(ProjectDir)..\..\Dependencies\dirent;$(ProjectDir)..\..\Dependencies\SOIL\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -82,8 +82,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Program Files\boost\boost-1.61.0-vs2013\lib;$(ProjectDir)..\..\Dependencies\glui;$(ProjectDir)..\..\Dependencies\freeglut;$(ProjectDir)..\..\Dependencies\glew;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;freeglut.lib;glew32.lib;glui32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\Dependencies\SOIL\lib;C:\Program Files\boost\boost-1.61.0-vs2013\lib;$(ProjectDir)..\..\Dependencies\glui;$(ProjectDir)..\..\Dependencies\freeglut;$(ProjectDir)..\..\Dependencies\glew;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;freeglut.lib;glew32.lib;glui32.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

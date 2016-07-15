@@ -24,6 +24,7 @@ public:
 	virtual void KeyboardUp(unsigned char key, int x, int y) override;
 	virtual void DrawShape(btScalar *transform, const btCollisionShape *pShape, const btVector3 &color) override;
 	void DrawTorso(const btVector3 &halfSize);
+	void DrawHead(float x, float y, float radius);
 	void DrawUpperLeg(const btVector3 &halfSize);
 	void DrawLowerLeg(const btVector3 &halfSize);
 	void DrawFoot(const btVector3 &halfSize);
@@ -111,6 +112,10 @@ private:
 	WalkingController *m_WalkingController;
 
 	btClock m_collisionClock;
+
+	// Texture mapping
+	GLuint m_trump_walking;
+	GLuint m_trump_falling;
 
 
 	// GLUI

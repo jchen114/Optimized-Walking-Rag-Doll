@@ -4,6 +4,7 @@
 #include "LinearMath\btVector3.h"
 #include <functional>
 #include <vector>
+#include "LinearMath\btQuickprof.h"
 
 class WalkingController;
 class RagDollApplication;
