@@ -4,6 +4,8 @@
 #include "State.h"
 #include "Gains.h"
 
+Gait::Gait() {}
+
 Gait::Gait(
 	State s0, State s1, State s2, State s3, State s4,
 	Gains torso_gains, Gains ull_gains, Gains url_gains, Gains lll_gains, Gains lrl_gains, Gains lf_gains, Gains rf_gains,

@@ -35,7 +35,7 @@ void InterpolationManager::Begin(std::string begin_gait, std::string end_gait, s
 	m_WalkingController->AddGait(interpolated_gait, gait_name);
 	// Register callback with Walking Controller to save body states
 	m_WalkingController->SetCallbackFunction(std::bind(&InterpolationManager::RecordStates, this, _1, _2, _3, _4));
-	m_RagDollApp->ChangeGait(m_gaitName);
+	m_RagDollApp->ChangeGait(m_gait_name);
 	// Save everything
 	m_RagDollApp->SaveStates();
 	m_RagDollApp->SaveGains();

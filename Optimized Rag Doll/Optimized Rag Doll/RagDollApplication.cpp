@@ -746,7 +746,7 @@ void RagDollApplication::ChangeState(int id) {
 
 void RagDollApplication::ChangeGait() {
 
-	printf("Previous gate: %s, New gait: %s \n", m_WalkingController->m_currentGait.c_str(), m_WalkingController->m_gaits.at(m_gait_idx).c_str());
+	//printf("Previous gate: %s, New gait: %s \n", m_WalkingController->m_currentGait.c_str(), m_WalkingController->m_gaits.at(m_gait_idx).c_str());
 
 	m_WalkingController->ChangeGait(m_WalkingController->m_gaits.at(m_gait_idx));
 	SetupGUIConfiguration();
@@ -761,7 +761,7 @@ void RagDollApplication::ChangeGait() {
 void RagDollApplication::ChangeGait(std::string gait_name) {
 
 	int pos = std::find(m_WalkingController->m_gaits.begin(), m_WalkingController->m_gaits.end(), gait_name) - m_WalkingController->m_gaits.begin();
-	printf("Change to gait %s with pos %d\n", gait_name.c_str(), pos);
+	//printf("Change to gait %s with pos %d\n", gait_name.c_str(), pos);
 	if (pos >= m_WalkingController->m_gaits.size()) {
 		return;
 	}

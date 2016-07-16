@@ -21,7 +21,7 @@ PolationManager::~PolationManager()
 
 void PolationManager::Begin(std::string begin_gait, std::string end_gait, std::string gait_name) {
 	
-	m_gaitName = gait_name;
+	m_gait_name = gait_name;
 
 }
 

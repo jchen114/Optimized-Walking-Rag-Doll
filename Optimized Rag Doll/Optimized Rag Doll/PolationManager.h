@@ -27,6 +27,8 @@ protected:
 	WalkingController *m_WalkingController;
 	RagDollApplication *m_RagDollApp;
 
-	std::string m_gaitName;
+	std::string m_gait_name;
+
+	
 };
 

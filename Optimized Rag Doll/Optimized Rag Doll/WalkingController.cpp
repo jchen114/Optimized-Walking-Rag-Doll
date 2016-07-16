@@ -309,7 +309,7 @@ void WalkingController::SaveStates(std::string gait) {
 	for (std::vector<State *>::iterator it = states.begin(); it != states.end(); it++) {
 		char buffer[100];
 		sprintf_s(buffer, "%f, %f, %f, %f, %f, %f, %f\n", (*it)->m_torsoAngle, (*it)->m_upperLeftLegAngle, (*it)->m_upperRightLegAngle, (*it)->m_lowerLeftLegAngle, (*it)->m_lowerRightLegAngle, (*it)->m_leftFootAngle, (*it)->m_rightFootAngle);
-		std::cout << buffer;
+		//std::cout << buffer;
 		states_file << buffer;
 	}
 	states_file.close();
@@ -322,7 +322,7 @@ void WalkingController::SaveStates() {
 	for (std::vector<State *>::iterator it = states.begin(); it != states.end(); it++) {
 		char buffer[100];
 		sprintf_s(buffer, "%f, %f, %f, %f, %f, %f, %f\n", (*it)->m_torsoAngle, (*it)->m_upperLeftLegAngle, (*it)->m_upperRightLegAngle, (*it)->m_lowerLeftLegAngle, (*it)->m_lowerRightLegAngle, (*it)->m_leftFootAngle, (*it)->m_rightFootAngle);
-		std::cout << buffer;
+		//std::cout << buffer;
 		states_file << buffer;
 	}
 	states_file.close();
@@ -335,7 +335,7 @@ void WalkingController::SaveGains(std::string gait) {
 	for (std::vector<Gains *>::iterator it = gains.begin(); it != gains.end(); it++) {
 		char buffer[100];
 		sprintf_s(buffer, "%f, %f \n", (*it)->m_kp, (*it)->m_kd);
-		std::cout << buffer;
+		//std::cout << buffer;
 		gains_file << buffer;
 	}
 	gains_file.close();
@@ -349,7 +349,7 @@ void WalkingController::SaveGains() {
 	for (std::vector<Gains *>::iterator it = gains.begin(); it != gains.end(); it++) {
 		char buffer[100];
 		sprintf_s(buffer, "%f, %f \n", (*it)->m_kp, (*it)->m_kd);
-		std::cout << buffer;
+		//std::cout << buffer;
 		gains_file << buffer;
 	}
 	gains_file.close();
@@ -360,7 +360,7 @@ void WalkingController::SaveFeedback(std::string gait) {
 	feedback_file.open("..\\..\\State Configurations\\Gaits\\" + gait + "\\feedbacks.fdbk");
 	char buffer[100];
 	sprintf_s(buffer, "%f, %f, %f, %f\n", *m_cd_1, *m_cv_1, *m_cd_2, *m_cv_2);
-	std::cout << buffer;
+	//std::cout << buffer;
 	feedback_file << buffer;
 	feedback_file.close();
 }
@@ -370,7 +370,7 @@ void WalkingController::SaveFeedback() {
 	feedback_file.open("..\\..\\State Configurations\\feedbacks.fdbk");
 	char buffer[100];
 	sprintf_s(buffer, "%f, %f, %f, %f\n", m_cd_1, m_cv_1, m_cd_2, m_cv_2);
-	std::cout << buffer;
+	//std::cout << buffer;
 	feedback_file << buffer;
 	feedback_file.close();
 }
@@ -380,7 +380,7 @@ void WalkingController::SaveTime(std::string gait) {
 	time_file.open("..\\..\\State Configurations\\Gaits\\" + gait + "\\stateTimes.tm");
 	char buffer[100];
 	sprintf_s(buffer, "%f\n", m_state_time);
-	std::cout << buffer;
+	//std::cout << buffer;
 	time_file << buffer;
 	time_file.close();
 }
@@ -390,7 +390,7 @@ void WalkingController::SaveTime() {
 	time_file.open("..\\..\\State Configurations\\stateTimes.tm");
 	char buffer[100];
 	sprintf_s(buffer, "%f\n", m_state_time);
-	std::cout << buffer;
+	//std::cout << buffer;
 	time_file << buffer;
 	time_file.close();
 }
@@ -728,7 +728,7 @@ void WalkingController::AddGait(Gait gait, std::string gait_name) {
 
 	// See if gait directory exists,  if not create it.
 	if (std::find(m_gaits.begin(), m_gaits.end(), gait_name) == m_gaits.end()) {
-		printf("gait %s does not exist. \n", gait_name.c_str());
+		//printf("gait %s does not exist. \n", gait_name.c_str());
 		std::string gait_dir = "..\\..\\State Configurations\\Gaits\\" + gait_name;
 		boost::filesystem::create_directory(gait_dir.c_str());
 		m_gaits.push_back(gait_name);
