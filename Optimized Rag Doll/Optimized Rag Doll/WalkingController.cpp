@@ -303,7 +303,7 @@ void WalkingController::SaveStates(std::string gait) {
 	//if (!Constants::GetInstance().FileExists(file_name)) { // If file name does not exist
 
 	//}
-	printf("save states to %s\n", file_name.c_str());
+	//printf("save states to %s\n", file_name.c_str());
 	states_file.open(file_name);
 	std::vector<State *> states = { m_state0, m_state1, m_state2, m_state3, m_state4 };
 	for (std::vector<State *>::iterator it = states.begin(); it != states.end(); it++) {
@@ -726,14 +726,15 @@ void WalkingController::ChangeGait(std::string gait) {
 
 void WalkingController::AddGait(Gait gait, std::string gait_name) {
 
+
 	// See if gait directory exists,  if not create it.
-	if (std::find(m_gaits.begin(), m_gaits.end(), gait_name) == m_gaits.end()) {
+	if (std::find(m_gaits.begin(), m_gaits.end(), gait_name) == m_gaits.end()) { // gait does not exist
 		//printf("gait %s does not exist. \n", gait_name.c_str());
 		std::string gait_dir = "..\\..\\State Configurations\\Gaits\\" + gait_name;
 		boost::filesystem::create_directory(gait_dir.c_str());
 		m_gaits.push_back(gait_name);
+		m_app->AddGait(gait_name);
 	}
-
 	// Make entry in maps for new gait.
 	// States
 	std::vector<State *>states;
@@ -760,13 +761,10 @@ void WalkingController::AddGait(Gait gait, std::string gait_name) {
 	// time
 	float state_time = gait.GetStateTime();
 
-	// Put everything into maps.
-	m_GaitMap.insert(std::pair<std::string, std::vector<State *>>(gait_name, states));
-	m_GainMap.insert(std::pair<std::string, std::vector<Gains *>>(gait_name, gains));
-	m_FdbkMap.insert(std::pair<std::string, std::vector<float>>(gait_name, fdbks));
-	m_TmMap.insert(std::pair<std::string, float>(gait_name, state_time));
-	
-	m_app->AddGait(gait_name);
+	m_GaitMap[gait_name] = states;
+	m_GainMap[gait_name] = gains;
+	m_FdbkMap[gait_name] = fdbks;
+	m_TmMap[gait_name] = state_time;
 
 }
 

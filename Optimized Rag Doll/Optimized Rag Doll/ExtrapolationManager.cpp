@@ -195,7 +195,7 @@ void ExtrapolationManager::RecordStates(std::vector<btVector3> linVec, std::vect
 
 	static const auto runOnce = [] { std::cout << "Received callback" << std::endl; return true; }();
 
-	if (m_clock.getTimeSeconds() >= 20) {
+	if (m_clock.getTimeSeconds() >= 10) {
 		if (m_WalkingController->m_ragDollState == STATE_5) {
 			// unsuccessful.
 			printf("Unsuccessful gait. \n");
@@ -207,7 +207,7 @@ void ExtrapolationManager::RecordStates(std::vector<btVector3> linVec, std::vect
 			std::ofstream dat_file;
 			std::string file_name = m_gait_dir + "\\info.dat";
 
-			printf("save data to %s\n", file_name.c_str());
+			//printf("save data to %s\n", file_name.c_str());
 			dat_file.open(file_name);
 
 			for (int body = 0; body < linVec.size(); body ++) {
